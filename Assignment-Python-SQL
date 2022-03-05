@@ -9,26 +9,17 @@ Prerequisites:
 -- Start new transaction - commit all or nothing
 --
 BEGIN;
-/
---
 -- Create and load tables used in the documentation examples.
---
--- Create the 'dept' table
---
-CREATE TABLE dept (
-deptno NUMBER(2) NOT NULL CONSTRAINT dept_pk PRIMARY KEY,
-dname VARCHAR2(14) CONSTRAINT dept_dname_uq UNIQUE,
-loc VARCHAR2(13)
-);
-
 
 ......................................................................
+-- Create the 'dept' table
 CREATE TABLE dept (
     deptno          Integer NOT NULL CONSTRAINT dept_pk PRIMARY KEY,
     dname           VARCHAR(14) NOT NULL CONSTRAINT dept_dname_uq UNIQUE,
     loc             VARCHAR(13)
 );
 
+-- Create the 'emp' table
 CREATE TABLE emp (
 empno Integer NOT NULL CONSTRAINT emp_pk PRIMARY KEY,
 ename VARCHAR(10),
@@ -41,6 +32,7 @@ deptno Integer CONSTRAINT emp_ref_dept_fk
 REFERENCES dept(deptno)
 );
 
+-- Create the 'jobhist' table
 CREATE TABLE jobhist (
 empno Integer NOT NULL,
 startdate DATE NOT NULL,
@@ -59,42 +51,6 @@ CONSTRAINT jobhist_date_chk CHECK (startdate <= enddate)
 );
 ......................................................................
 
-
-
---
--- Create the 'emp' table
---
-CREATE TABLE emp (
-empno NUMBER(4) NOT NULL CONSTRAINT emp_pk PRIMARY KEY,
-ename VARCHAR2(10),
-job VARCHAR2(9),
-mgr NUMBER(4),
-hiredate DATE,
-sal NUMBER(7,2) CONSTRAINT emp_sal_ck CHECK (sal > 0),
-comm NUMBER(7,2),
-deptno NUMBER(2) CONSTRAINT emp_ref_dept_fk
-REFERENCES dept(deptno)
-);
---
--- Create the 'jobhist' table
---
-CREATE TABLE jobhist (
-empno NUMBER(4) NOT NULL,
-startdate DATE NOT NULL,
-enddate DATE,
-job VARCHAR2(9),
-sal NUMBER(7,2),
-comm NUMBER(7,2),
-deptno NUMBER(2),
-chgdesc VARCHAR2(80),
-CONSTRAINT jobhist_pk PRIMARY KEY (empno, startdate),
-CONSTRAINT jobhist_ref_emp_fk FOREIGN KEY (empno)
-REFERENCES emp(empno) ON DELETE CASCADE,
-CONSTRAINT jobhist_ref_dept_fk FOREIGN KEY (deptno)
-REFERENCES dept (deptno) ON DELETE SET NULL,
-CONSTRAINT jobhist_date_chk CHECK (startdate <= enddate)
-);
---
 -- Create the 'salesemp' view
 --
 CREATE OR REPLACE VIEW salesemp AS
@@ -191,8 +147,8 @@ from emp join jobhist on emp.empno=jobhist.empno join dept on dept.deptno=jobhis
 
 Create table newTable(
 	empno Integer,
-	name varchar(20),
-	name varchar(20),
+	ename varchar(20),
+	dname varchar(20),
  	compensation Integer,
 	months Integer 	
 )
