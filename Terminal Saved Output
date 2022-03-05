@@ -1,0 +1,542 @@
+Last login: Sat Mar  5 09:55:00 on console
+satyaprakash@AS-MAC-0234 ~ % psql postgres
+psql (14.2)
+Type "help" for help.
+
+postgres=# \c test
+You are now connected to database "test" as user "satyaprakash".
+test=# 
+test=# 
+test=# select * from dept;
+ deptno |   dname    |   loc    
+--------+------------+----------
+     10 | ACCOUNTING | NEW YORK
+     20 | RESEARCH   | DALLAS
+     30 | SALES      | CHICAGO
+     40 | OPERATIONS | BOSTON
+(4 rows)
+
+test=# select * from emp;
+ empno | ename  |    job    | mgr  |  hiredate  |   sal   |  comm   | deptno 
+-------+--------+-----------+------+------------+---------+---------+--------
+  7369 | SMITH  | CLERK     | 7902 | 1980-12-17 |  800.00 |         |     20
+  7499 | ALLEN  | SALESMAN  | 7698 | 1981-02-20 | 1600.00 |  300.00 |     30
+  7521 | WARD   | SALESMAN  | 7698 | 1981-02-22 | 1250.00 |  500.00 |     30
+  7566 | JONES  | MANAGER   | 7839 | 1981-04-02 | 2975.00 |         |     20
+  7654 | MARTIN | SALESMAN  | 7698 | 1981-09-28 | 1250.00 | 1400.00 |     30
+  7698 | BLAKE  | MANAGER   | 7839 | 1981-05-01 | 2850.00 |         |     30
+  7782 | CLARK  | MANAGER   | 7839 | 1981-06-09 | 2450.00 |         |     10
+  7788 | SCOTT  | ANALYST   | 7566 | 1987-04-19 | 3000.00 |         |     20
+  7839 | KING   | PRESIDENT |      | 1981-11-17 | 5000.00 |         |     10
+  7844 | TURNER | SALESMAN  | 7698 | 1981-09-08 | 1500.00 |    0.00 |     30
+  7876 | ADAMS  | CLERK     | 7788 | 1987-05-23 | 1100.00 |         |     20
+  7900 | JAMES  | CLERK     | 7698 | 1981-12-03 |  950.00 |         |     30
+  7902 | FORD   | ANALYST   | 7566 | 1981-12-03 | 3000.00 |         |     20
+  7934 | MILLER | CLERK     | 7782 | 1982-01-23 | 1300.00 |         |     10
+(14 rows)
+
+test=# select * from jobhist;
+ empno | startdate  |  enddate   |    job    |   sal   |  comm   | deptno |       chgdesc       
+-------+------------+------------+-----------+---------+---------+--------+---------------------
+  7369 | 1980-12-17 |            | CLERK     |  800.00 |         |     20 | New Hire
+  7499 | 1981-02-20 |            | SALESMAN  | 1600.00 |  300.00 |     30 | New Hire
+  7521 | 1981-02-22 |            | SALESMAN  | 1250.00 |  500.00 |     30 | New Hire
+  7566 | 1981-04-02 |            | MANAGER   | 2975.00 |         |     20 | New Hire
+  7654 | 1981-09-28 |            | SALESMAN  | 1250.00 | 1400.00 |     30 | New Hire
+  7698 | 1981-05-01 |            | MANAGER   | 2850.00 |         |     30 | New Hire
+  7782 | 1981-06-09 |            | MANAGER   | 2450.00 |         |     10 | New Hire
+  7788 | 1987-04-19 | 1988-04-12 | CLERK     | 1000.00 |         |     20 | New Hire
+  7788 | 1988-04-13 | 1989-05-04 | CLERK     | 1040.00 |         |     20 | Raise
+  7788 | 1990-05-05 |            | ANALYST   | 3000.00 |         |     20 | Promoted to Analyst
+  7839 | 1981-11-17 |            | PRESIDENT | 5000.00 |         |     10 | New Hire
+  7844 | 1981-09-08 |            | SALESMAN  | 1500.00 |    0.00 |     30 | New Hire
+  7876 | 1987-05-23 |            | CLERK     | 1100.00 |         |     20 | New Hire
+  7900 | 1981-12-03 | 1983-01-14 | CLERK     |  950.00 |         |     10 | New Hire
+  7900 | 1983-01-15 |            | CLERK     |  950.00 |         |     30 | Changed to Dept 30
+  7902 | 1981-12-03 |            | ANALYST   | 3000.00 |         |     20 | New Hire
+  7934 | 1982-01-23 |            | CLERK     | 1300.00 |         |     10 | New Hire
+(17 rows)
+
+test=# select t1.empno,t1.ename,t2.ename from emp as t1 inner join jobhist as t2 t1.mgr=t2.empno;
+ERROR:  syntax error at or near "t1"
+LINE 1: ...,t2.ename from emp as t1 inner join jobhist as t2 t1.mgr=t2....
+                                                             ^
+test=# select t1.empno,t1.ename,t2.ename from emp as t1 inner join jobhist as t2 on t1.mgr=t2.empno;
+ERROR:  column t2.ename does not exist
+LINE 1: select t1.empno,t1.ename,t2.ename from emp as t1 inner join ...
+                                 ^
+HINT:  Perhaps you meant to reference the column "t1.ename".
+test=# select t1.empno,t1.ename, t2.ename from emp t1 inner join emp as t2 on t1.mgr=t2.empno;
+ empno | ename  | ename 
+-------+--------+-------
+  7369 | SMITH  | FORD
+  7499 | ALLEN  | BLAKE
+  7521 | WARD   | BLAKE
+  7566 | JONES  | KING
+  7654 | MARTIN | BLAKE
+  7698 | BLAKE  | KING
+  7782 | CLARK  | KING
+  7788 | SCOTT  | JONES
+  7844 | TURNER | BLAKE
+  7876 | ADAMS  | SCOTT
+  7900 | JAMES  | BLAKE
+  7902 | FORD   | JONES
+  7934 | MILLER | CLARK
+(13 rows)
+
+test=# select * from emp join jobhist on emp.empno=jobhist.empno;
+ empno | ename  |    job    | mgr  |  hiredate  |   sal   |  comm   | deptno | empno | startdate  |  enddate   |    job    |   sal   |  comm   | deptno |       chgdesc       
+-------+--------+-----------+------+------------+---------+---------+--------+-------+------------+------------+-----------+---------+---------+--------+---------------------
+  7369 | SMITH  | CLERK     | 7902 | 1980-12-17 |  800.00 |         |     20 |  7369 | 1980-12-17 |            | CLERK     |  800.00 |         |     20 | New Hire
+  7499 | ALLEN  | SALESMAN  | 7698 | 1981-02-20 | 1600.00 |  300.00 |     30 |  7499 | 1981-02-20 |            | SALESMAN  | 1600.00 |  300.00 |     30 | New Hire
+  7521 | WARD   | SALESMAN  | 7698 | 1981-02-22 | 1250.00 |  500.00 |     30 |  7521 | 1981-02-22 |            | SALESMAN  | 1250.00 |  500.00 |     30 | New Hire
+  7566 | JONES  | MANAGER   | 7839 | 1981-04-02 | 2975.00 |         |     20 |  7566 | 1981-04-02 |            | MANAGER   | 2975.00 |         |     20 | New Hire
+  7654 | MARTIN | SALESMAN  | 7698 | 1981-09-28 | 1250.00 | 1400.00 |     30 |  7654 | 1981-09-28 |            | SALESMAN  | 1250.00 | 1400.00 |     30 | New Hire
+  7698 | BLAKE  | MANAGER   | 7839 | 1981-05-01 | 2850.00 |         |     30 |  7698 | 1981-05-01 |            | MANAGER   | 2850.00 |         |     30 | New Hire
+  7782 | CLARK  | MANAGER   | 7839 | 1981-06-09 | 2450.00 |         |     10 |  7782 | 1981-06-09 |            | MANAGER   | 2450.00 |         |     10 | New Hire
+  7788 | SCOTT  | ANALYST   | 7566 | 1987-04-19 | 3000.00 |         |     20 |  7788 | 1987-04-19 | 1988-04-12 | CLERK     | 1000.00 |         |     20 | New Hire
+  7788 | SCOTT  | ANALYST   | 7566 | 1987-04-19 | 3000.00 |         |     20 |  7788 | 1988-04-13 | 1989-05-04 | CLERK     | 1040.00 |         |     20 | Raise
+  7788 | SCOTT  | ANALYST   | 7566 | 1987-04-19 | 3000.00 |         |     20 |  7788 | 1990-05-05 |            | ANALYST   | 3000.00 |         |     20 | Promoted to Analyst
+  7839 | KING   | PRESIDENT |      | 1981-11-17 | 5000.00 |         |     10 |  7839 | 1981-11-17 |            | PRESIDENT | 5000.00 |         |     10 | New Hire
+  7844 | TURNER | SALESMAN  | 7698 | 1981-09-08 | 1500.00 |    0.00 |     30 |  7844 | 1981-09-08 |            | SALESMAN  | 1500.00 |    0.00 |     30 | New Hire
+  7876 | ADAMS  | CLERK     | 7788 | 1987-05-23 | 1100.00 |         |     20 |  7876 | 1987-05-23 |            | CLERK     | 1100.00 |         |     20 | New Hire
+  7900 | JAMES  | CLERK     | 7698 | 1981-12-03 |  950.00 |         |     30 |  7900 | 1981-12-03 | 1983-01-14 | CLERK     |  950.00 |         |     10 | New Hire
+  7900 | JAMES  | CLERK     | 7698 | 1981-12-03 |  950.00 |         |     30 |  7900 | 1983-01-15 |            | CLERK     |  950.00 |         |     30 | Changed to Dept 30
+  7902 | FORD   | ANALYST   | 7566 | 1981-12-03 | 3000.00 |         |     20 |  7902 | 1981-12-03 |            | ANALYST   | 3000.00 |         |     20 | New Hire
+  7934 | MILLER | CLERK     | 7782 | 1982-01-23 | 1300.00 |         |     10 |  7934 | 1982-01-23 |            | CLERK     | 1300.00 |         |     10 | New Hire
+(17 rows)
+
+test=# select empno,ename,EXTRACT(year FROM age(enddate,startdate))*12 + EXTRACT(month FROM age(enddate,startdate)) from emp join jobhist on emp.empno=jobhist.empno;
+ERROR:  column reference "empno" is ambiguous
+LINE 1: select empno,ename,EXTRACT(year FROM age(enddate,startdate))...
+               ^
+test=# select emp.empno,emp.ename,EXTRACT(year FROM age(enddate,startdate))*12 + EXTRACT(month FROM age(enddate,startdate)) from emp join jobhist on emp.empno=jobhist.empno;
+ empno | ename  | ?column? 
+-------+--------+----------
+  7369 | SMITH  |         
+  7499 | ALLEN  |         
+  7521 | WARD   |         
+  7566 | JONES  |         
+  7654 | MARTIN |         
+  7698 | BLAKE  |         
+  7782 | CLARK  |         
+  7788 | SCOTT  |       11
+  7788 | SCOTT  |       12
+  7788 | SCOTT  |         
+  7839 | KING   |         
+  7844 | TURNER |         
+  7876 | ADAMS  |         
+  7900 | JAMES  |       13
+  7900 | JAMES  |         
+  7902 | FORD   |         
+  7934 | MILLER |         
+(17 rows)
+
+test=# select empno,ename,EXTRACT(year FROM age(enddate,startdate))*12 + EXTRACT(month FROM age(enddate,startdate)) from emp join jobhist on emp.empno=jobhist.empno;
+ERROR:  column reference "empno" is ambiguous
+LINE 1: select empno,ename,EXTRACT(year FROM age(enddate,startdate))...
+               ^
+test=# select emp.empno, emp.ename 
+test-# case
+test-# when enddate is not null then EXTRACT(year FROM age(enddate,startdate))*12 + EXTRACT(month FROM age(enddate,startdate))
+test-# when enddate is null then EXTRACT(year FROM age('2022-03-04',startdate))*12 + EXTRACT(month FROM age('2022-03-04',startdate))
+test-# end months
+test-# from emp join jobhist on emp.empno=jobhist.empno;
+ERROR:  syntax error at or near "when"
+LINE 3: when enddate is not null then EXTRACT(year FROM age(enddate,...
+        ^
+test=# select emp.empno, emp.ename 
+case
+when enddate is not NULL then EXTRACT(year FROM age(enddate,startdate))*12 + EXTRACT(month FROM age(enddate,startdate))
+when enddate is NULL then EXTRACT(year FROM age('2022-03-04',startdate))*12 + EXTRACT(month FROM age('2022-03-04',startdate))
+end months
+from emp join jobhist on emp.empno=jobhist.empno;
+ERROR:  syntax error at or near "when"
+LINE 3: when enddate is not NULL then EXTRACT(year FROM age(enddate,...
+        ^
+test=# select emp.empno, emp.ename 
+case
+when enddate is not NULL then EXTRACT(year FROM age(enddate,startdate))*12 + EXTRACT(month FROM age(enddate,startdate))
+when enddate is NULL then EXTRACT(year FROM age('2022-03-04',startdate))*12 + EXTRACT(month FROM age('2022-03-04',startdate))
+end months
+from emp join jobhist on emp.empno=jobhist.empno;
+ERROR:  syntax error at or near "when"
+LINE 3: when enddate is not NULL then EXTRACT(year FROM age(enddate,...
+        ^
+test=# 
+test=# 
+test=# 
+test=# 
+test=# 
+test=# 
+test=# 
+test=# 
+test=# 
+test=# 
+test=# 
+test=# 
+test=# 
+test=# select emp.empno, emp.ename
+test-# , CASE WHEN enddate IS NOT NULL then EXTRACT(year FROM age(enddate,startdate))*12 + EXTRACT(month FROM age(enddate,startdate)) else EXTRACT(year FROM age('2022-03-04',startdate))*12 + EXTRACT(month FROM age('2022-03-04',startdate)) as months from emp join jobhist on emp.empno=jobhist.empno;
+ERROR:  syntax error at or near "as"
+LINE 2: ...+ EXTRACT(month FROM age('2022-03-04',startdate)) as months ...
+                                                             ^
+test=# select emp.empno, emp.ename
+, CASE WHEN enddate IS NOT NULL then EXTRACT(year FROM age(enddate,startdate))*12 + EXTRACT(month FROM age(enddate,startdate)) else EXTRACT(year FROM age('2022-03-04',startdate))*12 + EXTRACT(month FROM age('2022-03-04',startdate)) months from emp join jobhist on emp.empno=jobhist.empno;
+ERROR:  syntax error at or near "months"
+LINE 2: ...+ EXTRACT(month FROM age('2022-03-04',startdate)) months fro...
+                                                             ^
+test=# select emp.empno, emp.ename
+, CASE WHEN enddate IS NOT NULL then EXTRACT(year FROM age(enddate,startdate))*12 + EXTRACT(month FROM age(enddate,startdate)) else EXTRACT(year FROM age('2022-03-04',startdate))*12 + EXTRACT(month FROM age('2022-03-04',startdate)) from emp join jobhist on emp.empno=jobhist.empno;
+ERROR:  syntax error at or near "from"
+LINE 2: ...+ EXTRACT(month FROM age('2022-03-04',startdate)) from emp j...
+                                                             ^
+test=# select emp.empno, emp.ename,CASE WHEN enddate IS NOT NULL then EXTRACT(year FROM age(enddate,startdate))*12 + EXTRACT(month FROM age(enddate,startdate)) else EXTRACT(year FROM age('2022-03-04',startdate))*12 + EXTRACT(month FROM age('2022-03-04',startdate)) from emp join jobhist on emp.empno=jobhist.empno;
+ERROR:  syntax error at or near "from"
+LINE 1: ...+ EXTRACT(month FROM age('2022-03-04',startdate)) from emp j...
+                                                             ^
+test=# select emp.empno, emp.ename,CASE WHEN enddate IS NOT NULL then EXTRACT(year FROM age(enddate,startdate))*12 + EXTRACT(month FROM age(enddate,startdate)) else EXTRACT(year FROM age('2022-03-04',startdate))*12 + EXTRACT(month FROM age('2022-03-04',startdate)) END months from emp join jobhist on emp.empno=jobhist.empno;
+ empno | ename  | months 
+-------+--------+--------
+  7369 | SMITH  |    494
+  7499 | ALLEN  |    492
+  7521 | WARD   |    492
+  7566 | JONES  |    491
+  7654 | MARTIN |    485
+  7698 | BLAKE  |    490
+  7782 | CLARK  |    488
+  7788 | SCOTT  |     11
+  7788 | SCOTT  |     12
+  7788 | SCOTT  |    381
+  7839 | KING   |    483
+  7844 | TURNER |    485
+  7876 | ADAMS  |    417
+  7900 | JAMES  |     13
+  7900 | JAMES  |    469
+  7902 | FORD   |    483
+  7934 | MILLER |    481
+(17 rows)
+
+test=# select emp.empno, emp.ename,dept.dname, CASE WHEN enddate IS NOT NULL then EXTRACT(year FROM age(enddate,startdate))*12 + EXTRACT(month FROM age(enddate,startdate)) else EXTRACT(year FROM age('2022-03-04',startdate))*12 + EXTRACT(month FROM age('2022-03-04',startdate)) END months from emp join jobhist on emp.empno=jobhist.empno join dept on dept.deptno=jobhist.deptno;
+ empno | ename  |   dname    | months 
+-------+--------+------------+--------
+  7369 | SMITH  | RESEARCH   |    494
+  7499 | ALLEN  | SALES      |    492
+  7521 | WARD   | SALES      |    492
+  7566 | JONES  | RESEARCH   |    491
+  7654 | MARTIN | SALES      |    485
+  7698 | BLAKE  | SALES      |    490
+  7782 | CLARK  | ACCOUNTING |    488
+  7788 | SCOTT  | RESEARCH   |     11
+  7788 | SCOTT  | RESEARCH   |     12
+  7788 | SCOTT  | RESEARCH   |    381
+  7839 | KING   | ACCOUNTING |    483
+  7844 | TURNER | SALES      |    485
+  7876 | ADAMS  | RESEARCH   |    417
+  7900 | JAMES  | ACCOUNTING |     13
+  7900 | JAMES  | SALES      |    469
+  7902 | FORD   | RESEARCH   |    483
+  7934 | MILLER | ACCOUNTING |    481
+(17 rows)
+
+test=# select emp.empno, emp.ename,dept.dname, CASE WHEN enddate IS NOT NULL then EXTRACT(year FROM age(enddate,startdate))*12 + EXTRACT(month FROM age(enddate,startdate)) else EXTRACT(year FROM age('2022-03-04',startdate))*12 + EXTRACT(month FROM age('2022-03-04',startdate)) END months, months*emp.sal as compensation from emp join jobhist on emp.empno=jobhist.empno join dept on dept.deptno=jobhist.deptno;
+ERROR:  column "months" does not exist
+LINE 1: ...nth FROM age('2022-03-04',startdate)) END months, months*emp...
+                                                             ^
+test=# select emp.empno, emp.ename,dept.dname, CASE WHEN enddate IS NOT NULL then EXTRACT(year FROM age(enddate,startdate))*12 + EXTRACT(month FROM age(enddate,startdate)) else EXTRACT(year FROM age('2022-03-04',startdate))*12 + EXTRACT(month FROM age('2022-03-04',startdate)) END months as compensation from emp join jobhist on emp.empno=jobhist.empno join dept on dept.deptno=jobhist.deptno;
+ERROR:  syntax error at or near "as"
+LINE 1: ...onth FROM age('2022-03-04',startdate)) END months as compens...
+                                                             ^
+test=# select emp.empno, emp.ename,dept.dname, CASE WHEN enddate IS NOT NULL then EXTRACT(year FROM age(enddate,startdate))*12 + EXTRACT(month FROM age(enddate,startdate)) else EXTRACT(year FROM age('2022-03-04',startdate))*12 + EXTRACT(month FROM age('2022-03-04',startdate)) END months from emp join jobhist on emp.empno=jobhist.empno join dept on dept.deptno=jobhist.deptno;
+ empno | ename  |   dname    | months 
+-------+--------+------------+--------
+  7369 | SMITH  | RESEARCH   |    494
+  7499 | ALLEN  | SALES      |    492
+  7521 | WARD   | SALES      |    492
+  7566 | JONES  | RESEARCH   |    491
+  7654 | MARTIN | SALES      |    485
+  7698 | BLAKE  | SALES      |    490
+  7782 | CLARK  | ACCOUNTING |    488
+  7788 | SCOTT  | RESEARCH   |     11
+  7788 | SCOTT  | RESEARCH   |     12
+  7788 | SCOTT  | RESEARCH   |    381
+  7839 | KING   | ACCOUNTING |    483
+  7844 | TURNER | SALES      |    485
+  7876 | ADAMS  | RESEARCH   |    417
+  7900 | JAMES  | ACCOUNTING |     13
+  7900 | JAMES  | SALES      |    469
+  7902 | FORD   | RESEARCH   |    483
+  7934 | MILLER | ACCOUNTING |    481
+(17 rows)
+
+test=# select emp.empno, emp.ename,dept.dname, CASE WHEN enddate IS NOT NULL then EXTRACT(year FROM age(enddate,startdate))*12 + EXTRACT(month FROM age(enddate,startdate)) else EXTRACT(year FROM age('2022-03-04',startdate))*12 + EXTRACT(month FROM age('2022-03-04',startdate)) END *emp.sal from emp join jobhist on emp.empno=jobhist.empno join dept on dept.deptno=jobhist.deptno;
+ empno | ename  |   dname    |  ?column?  
+-------+--------+------------+------------
+  7369 | SMITH  | RESEARCH   |  395200.00
+  7499 | ALLEN  | SALES      |  787200.00
+  7521 | WARD   | SALES      |  615000.00
+  7566 | JONES  | RESEARCH   | 1460725.00
+  7654 | MARTIN | SALES      |  606250.00
+  7698 | BLAKE  | SALES      | 1396500.00
+  7782 | CLARK  | ACCOUNTING | 1195600.00
+  7788 | SCOTT  | RESEARCH   |   33000.00
+  7788 | SCOTT  | RESEARCH   |   36000.00
+  7788 | SCOTT  | RESEARCH   | 1143000.00
+  7839 | KING   | ACCOUNTING | 2415000.00
+  7844 | TURNER | SALES      |  727500.00
+  7876 | ADAMS  | RESEARCH   |  458700.00
+  7900 | JAMES  | ACCOUNTING |   12350.00
+  7900 | JAMES  | SALES      |  445550.00
+  7902 | FORD   | RESEARCH   | 1449000.00
+  7934 | MILLER | ACCOUNTING |  625300.00
+(17 rows)
+
+test=# select emp.empno, emp.ename,dept.dname, CASE WHEN enddate IS NOT NULL then EXTRACT(year FROM age(enddate,startdate))*12 + EXTRACT(month FROM age(enddate,startdate)) else EXTRACT(year FROM age('2022-03-04',startdate))*12 + EXTRACT(month FROM age('2022-03-04',startdate)) END *emp.sal Compensation,CASE WHEN enddate IS NOT NULL then EXTRACT(year FROM age(enddate,startdate))*12 + EXTRACT(month FROM age(enddate,startdate)) else EXTRACT(year FROM age('2022-03-04',startdate))*12 + EXTRACT(month FROM age('2022-03-04',startdate)) END Total_Months from emp join jobhist on emp.empno=jobhist.empno join dept on dept.deptno=jobhist.deptno;
+ empno | ename  |   dname    | compensation | total_months 
+-------+--------+------------+--------------+--------------
+  7369 | SMITH  | RESEARCH   |    395200.00 |          494
+  7499 | ALLEN  | SALES      |    787200.00 |          492
+  7521 | WARD   | SALES      |    615000.00 |          492
+  7566 | JONES  | RESEARCH   |   1460725.00 |          491
+  7654 | MARTIN | SALES      |    606250.00 |          485
+  7698 | BLAKE  | SALES      |   1396500.00 |          490
+  7782 | CLARK  | ACCOUNTING |   1195600.00 |          488
+  7788 | SCOTT  | RESEARCH   |     33000.00 |           11
+  7788 | SCOTT  | RESEARCH   |     36000.00 |           12
+  7788 | SCOTT  | RESEARCH   |   1143000.00 |          381
+  7839 | KING   | ACCOUNTING |   2415000.00 |          483
+  7844 | TURNER | SALES      |    727500.00 |          485
+  7876 | ADAMS  | RESEARCH   |    458700.00 |          417
+  7900 | JAMES  | ACCOUNTING |     12350.00 |           13
+  7900 | JAMES  | SALES      |    445550.00 |          469
+  7902 | FORD   | RESEARCH   |   1449000.00 |          483
+  7934 | MILLER | ACCOUNTING |    625300.00 |          481
+(17 rows)
+
+test=# Create table newTable(
+        empno Integer,
+        name varchar(20),
+        name varchar(20),
+        compensation Integer,
+        months Integer  
+)
+test-# ;
+ERROR:  column "name" specified more than once
+test=# Create table newTable(                                                                                                                                                                                       empno Integer,                                                                                                                                                                                              ename varchar(20),                                                                                                                                                                                          dname varchar(20),
+        compensation Integer,
+        months Integer  
+)
+;
+CREATE TABLE
+test=# 
+test=# 
+test=# select * from newtable;
+ empno | ename  |   dname    | compensation | months 
+-------+--------+------------+--------------+--------
+  7369 | SMITH  | RESEARCH   |       395200 |    494
+  7499 | ALLEN  | SALES      |       787200 |    492
+  7521 | WARD   | SALES      |       615000 |    492
+  7566 | JONES  | RESEARCH   |      1460725 |    491
+  7654 | MARTIN | SALES      |       606250 |    485
+  7698 | BLAKE  | SALES      |      1396500 |    490
+  7782 | CLARK  | ACCOUNTING |      1195600 |    488
+  7788 | SCOTT  | RESEARCH   |        33000 |     11
+  7788 | SCOTT  | RESEARCH   |        36000 |     12
+  7788 | SCOTT  | RESEARCH   |      1143000 |    381
+  7839 | KING   | ACCOUNTING |      2415000 |    483
+  7844 | TURNER | SALES      |       727500 |    485
+  7876 | ADAMS  | RESEARCH   |       458700 |    417
+  7900 | JAMES  | ACCOUNTING |        12350 |     13
+  7900 | JAMES  | SALES      |       445550 |    469
+  7902 | FORD   | RESEARCH   |      1449000 |    483
+  7934 | MILLER | ACCOUNTING |       625300 |    481
+(17 rows)
+
+test=# select t2.deptno, t1.dname, sum(compensation) as total_Comp from newtable t1 join dept t2 on t1.dname=t2.dname group by t1.dname; 
+ERROR:  column "t2.deptno" must appear in the GROUP BY clause or be used in an aggregate function
+LINE 1: select t2.deptno, t1.dname, sum(compensation) as total_Comp ...
+               ^
+test=# select deptno, dname, sum(compensation) as total_Comp from newtable t1 join dept t2 on t1.dname=t2.dname group by t1.dname; 
+ERROR:  column reference "dname" is ambiguous
+LINE 1: select deptno, dname, sum(compensation) as total_Comp from n...
+                       ^
+test=# select t2.deptno, t1.dname, sum(compensation) as total_Comp from newtable t1 join dept t2 on t1.dname=t2.dname group by t1.dname; 
+ERROR:  column "t2.deptno" must appear in the GROUP BY clause or be used in an aggregate function
+LINE 1: select t2.deptno, t1.dname, sum(compensation) as total_Comp ...
+               ^
+test=# select  t1.dname,t2.deptno, sum(compensation) as total_Comp from newtable t1 join dept t2 on t1.dname=t2.dname group by t1.dname; 
+ERROR:  column "t2.deptno" must appear in the GROUP BY clause or be used in an aggregate function
+LINE 1: select  t1.dname,t2.deptno, sum(compensation) as total_Comp ...
+                         ^
+test=# select * from newtable t1 join dept t2 on t1.dname=t2.dname; 
+ empno | ename  |   dname    | compensation | months | deptno |   dname    |   loc    
+-------+--------+------------+--------------+--------+--------+------------+----------
+  7369 | SMITH  | RESEARCH   |       395200 |    494 |     20 | RESEARCH   | DALLAS
+  7499 | ALLEN  | SALES      |       787200 |    492 |     30 | SALES      | CHICAGO
+  7521 | WARD   | SALES      |       615000 |    492 |     30 | SALES      | CHICAGO
+  7566 | JONES  | RESEARCH   |      1460725 |    491 |     20 | RESEARCH   | DALLAS
+  7654 | MARTIN | SALES      |       606250 |    485 |     30 | SALES      | CHICAGO
+  7698 | BLAKE  | SALES      |      1396500 |    490 |     30 | SALES      | CHICAGO
+  7782 | CLARK  | ACCOUNTING |      1195600 |    488 |     10 | ACCOUNTING | NEW YORK
+  7788 | SCOTT  | RESEARCH   |        33000 |     11 |     20 | RESEARCH   | DALLAS
+  7788 | SCOTT  | RESEARCH   |        36000 |     12 |     20 | RESEARCH   | DALLAS
+  7788 | SCOTT  | RESEARCH   |      1143000 |    381 |     20 | RESEARCH   | DALLAS
+  7839 | KING   | ACCOUNTING |      2415000 |    483 |     10 | ACCOUNTING | NEW YORK
+  7844 | TURNER | SALES      |       727500 |    485 |     30 | SALES      | CHICAGO
+  7876 | ADAMS  | RESEARCH   |       458700 |    417 |     20 | RESEARCH   | DALLAS
+  7900 | JAMES  | ACCOUNTING |        12350 |     13 |     10 | ACCOUNTING | NEW YORK
+  7900 | JAMES  | SALES      |       445550 |    469 |     30 | SALES      | CHICAGO
+  7902 | FORD   | RESEARCH   |      1449000 |    483 |     20 | RESEARCH   | DALLAS
+  7934 | MILLER | ACCOUNTING |       625300 |    481 |     10 | ACCOUNTING | NEW YORK
+(17 rows)
+
+test=# select dname from newtable t1 join dept t2 on t1.dname=t2.dname; 
+ERROR:  column reference "dname" is ambiguous
+LINE 1: select dname from newtable t1 join dept t2 on t1.dname=t2.dn...
+               ^
+test=# select t1.dname from newtable t1 join dept t2 on t1.dname=t2.dname; 
+   dname    
+------------
+ RESEARCH
+ SALES
+ SALES
+ RESEARCH
+ SALES
+ SALES
+ ACCOUNTING
+ RESEARCH
+ RESEARCH
+ RESEARCH
+ ACCOUNTING
+ SALES
+ RESEARCH
+ ACCOUNTING
+ SALES
+ RESEARCH
+ ACCOUNTING
+(17 rows)
+
+test=# select t1.dname from newtable t1 join dept t2 on t1.dname=t2.dname; 
+   dname    
+------------
+ RESEARCH
+ SALES
+ SALES
+ RESEARCH
+ SALES
+ SALES
+ ACCOUNTING
+ RESEARCH
+ RESEARCH
+ RESEARCH
+ ACCOUNTING
+ SALES
+ RESEARCH
+ ACCOUNTING
+ SALES
+ RESEARCH
+ ACCOUNTING
+(17 rows)
+
+test=# select t1.dname,count(*) from newtable t1 join dept t2 on t1.dname=t2.dname group by t1.dname; 
+   dname    | count 
+------------+-------
+ ACCOUNTING |     4
+ SALES      |     6
+ RESEARCH   |     7
+(3 rows)
+
+test=# select t1.dname,sum(t1.compensation) from newtable t1 join dept t2 on t1.dname=t2.dname group by t1.dname; 
+   dname    |   sum   
+------------+---------
+ ACCOUNTING | 4248250
+ SALES      | 4578000
+ RESEARCH   | 4975625
+(3 rows)
+
+test=# select t1.dname,t2.deptno,sum(t1.compensation) from newtable t1 join dept t2 on t1.dname=t2.dname group by t1.dname; 
+ERROR:  column "t2.deptno" must appear in the GROUP BY clause or be used in an aggregate function
+LINE 1: select t1.dname,t2.deptno,sum(t1.compensation) from newtable...
+                        ^
+test=# select t1.dname,t2.deptno,sum(t1.compensation) from newtable t1 join dept t2 on t1.dname=t2.dname group by t1.dname,t2.deptno; 
+   dname    | deptno |   sum   
+------------+--------+---------
+ RESEARCH   |     20 | 4975625
+ ACCOUNTING |     10 | 4248250
+ SALES      |     30 | 4578000
+(3 rows)
+
+test=# select * from newtable;
+ empno | ename  |   dname    | compensation | months 
+-------+--------+------------+--------------+--------
+  7369 | SMITH  | RESEARCH   |       395200 |    494
+  7499 | ALLEN  | SALES      |       787200 |    492
+  7521 | WARD   | SALES      |       615000 |    492
+  7566 | JONES  | RESEARCH   |      1460725 |    491
+  7654 | MARTIN | SALES      |       606250 |    485
+  7698 | BLAKE  | SALES      |      1396500 |    490
+  7782 | CLARK  | ACCOUNTING |      1195600 |    488
+  7788 | SCOTT  | RESEARCH   |        33000 |     11
+  7788 | SCOTT  | RESEARCH   |        36000 |     12
+  7788 | SCOTT  | RESEARCH   |      1143000 |    381
+  7839 | KING   | ACCOUNTING |      2415000 |    483
+  7844 | TURNER | SALES      |       727500 |    485
+  7876 | ADAMS  | RESEARCH   |       458700 |    417
+  7900 | JAMES  | ACCOUNTING |        12350 |     13
+  7900 | JAMES  | SALES      |       445550 |    469
+  7902 | FORD   | RESEARCH   |      1449000 |    483
+  7934 | MILLER | ACCOUNTING |       625300 |    481
+  7369 | SMITH  | RESEARCH   |       395200 |    494
+  7499 | ALLEN  | SALES      |       787200 |    492
+  7521 | WARD   | SALES      |       615000 |    492
+  7566 | JONES  | RESEARCH   |      1460725 |    491
+  7654 | MARTIN | SALES      |       606250 |    485
+  7698 | BLAKE  | SALES      |      1396500 |    490
+  7782 | CLARK  | ACCOUNTING |      1195600 |    488
+  7788 | SCOTT  | RESEARCH   |        33000 |     11
+  7788 | SCOTT  | RESEARCH   |        36000 |     12
+  7788 | SCOTT  | RESEARCH   |      1143000 |    381
+  7839 | KING   | ACCOUNTING |      2415000 |    483
+  7844 | TURNER | SALES      |       727500 |    485
+  7876 | ADAMS  | RESEARCH   |       458700 |    417
+  7900 | JAMES  | ACCOUNTING |        12350 |     13
+  7900 | JAMES  | SALES      |       445550 |    469
+  7902 | FORD   | RESEARCH   |      1449000 |    483
+  7934 | MILLER | ACCOUNTING |       625300 |    481
+(34 rows)
+
+test=# drop table newTable
+test-# ;
+DROP TABLE
+test=# Create table newTable(
+        empno Integer,
+        ename varchar(20),
+        dname varchar(20),
+        compensation Integer,
+        months Integer  
+)
+;
+CREATE TABLE
+test=# select * from newtable;
+ empno | ename  |   dname    | compensation | months 
+-------+--------+------------+--------------+--------
+  7369 | SMITH  | RESEARCH   |       395200 |    494
+  7499 | ALLEN  | SALES      |       787200 |    492
+  7521 | WARD   | SALES      |       615000 |    492
+  7566 | JONES  | RESEARCH   |      1460725 |    491
+  7654 | MARTIN | SALES      |       606250 |    485
+  7698 | BLAKE  | SALES      |      1396500 |    490
+  7782 | CLARK  | ACCOUNTING |      1195600 |    488
+  7788 | SCOTT  | RESEARCH   |        33000 |     11
+  7788 | SCOTT  | RESEARCH   |        36000 |     12
+  7788 | SCOTT  | RESEARCH   |      1143000 |    381
+  7839 | KING   | ACCOUNTING |      2415000 |    483
+  7844 | TURNER | SALES      |       727500 |    485
+  7876 | ADAMS  | RESEARCH   |       458700 |    417
+  7900 | JAMES  | ACCOUNTING |        12350 |     13
+  7900 | JAMES  | SALES      |       445550 |    469
+  7902 | FORD   | RESEARCH   |      1449000 |    483
+  7934 | MILLER | ACCOUNTING |       625300 |    481
+(17 rows)
+
+test=# 
