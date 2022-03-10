@@ -122,6 +122,24 @@ Problems:
 3.	Read and upload the above xlsx in 2) into a new table in the Postgres DB
 4.	From the xlsx in 2) create another xlsx to list total compensation given at Department level till date. Columns: Dept No, Dept,Name, Compensation
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Important points:
 
 1.	The python code should be properly commented at Class level, method level and wherever possible.
@@ -138,8 +156,10 @@ Important points:
 select emp.empno, emp.ename, dept.dname,
 CASE WHEN enddate IS NOT NULL then EXTRACT(year FROM age(enddate,startdate))*12 + EXTRACT(month FROM age(enddate,startdate))
 else EXTRACT(year FROM age('2022-03-04',startdate))*12 + EXTRACT(month FROM age('2022-03-04',startdate)) END * sal,
+
 CASE WHEN enddate IS NOT NULL then EXTRACT(year FROM age(enddate,startdate))*12 + EXTRACT(month FROM age(enddate,startdate))
-else EXTRACT(year FROM age('2022-03-04',startdate))*12 + EXTRACT(month FROM age('2022-03-04',startdate)) END as Months 
+else EXTRACT(year FROM age('2022-03-04',startdate))*12 + EXTRACT(month FROM age('2022-03-04',startdate)) END as Months
+
 from emp join jobhist on emp.empno=jobhist.empno join dept on dept.deptno=jobhist.deptno;
 
 
